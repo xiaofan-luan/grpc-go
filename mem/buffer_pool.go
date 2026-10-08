@@ -51,7 +51,7 @@ var (
 
 func init() {
 	var err error
-	defaultBufferPool, err = NewBinaryTieredBufferPool(defaultBufferPoolSizeExponents...)
+	defaultBufferPool, err = mem.NewDirtyBinaryTieredBufferPool(defaultBufferPoolSizeExponents...)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to create default buffer pool: %v", err))
 	}
@@ -61,9 +61,10 @@ func init() {
 	}
 }
 
-// DefaultBufferPool returns the current default buffer pool. It is a BufferPool
-// created with NewBufferPool that uses a set of default sizes optimized for
-// expected workflows.
+// DefaultBufferPool returns the current default buffer pool. The default is a
+// binary-tiered pool with size classes optimized for expected workflows.
+// Reused buffers are not guaranteed to be zeroed; callers must initialize every
+// byte they read or publish.
 func DefaultBufferPool() BufferPool {
 	return defaultBufferPool
 }
